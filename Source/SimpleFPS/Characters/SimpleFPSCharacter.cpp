@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/ChildActorComponent.h"
 #include "../Components/AttributeComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -30,6 +31,9 @@ ASimpleFPSCharacter::ASimpleFPSCharacter()
     Mesh1P->bCastDynamicShadow = false;
     Mesh1P->CastShadow = false;
     Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+    Gun = CreateDefaultSubobject<UChildActorComponent>(TEXT("Gun"));
+    Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
 
     AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
 }
