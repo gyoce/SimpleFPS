@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-#include "../Components/AttributeComponent.h"
+#include "EnhancedInputComponent.h"
 #include "SimpleFPSCharacter.generated.h"
 
 class UInputComponent;
@@ -64,13 +64,13 @@ protected:
 
 public:
     /** Look Input Action */
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess="true"))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     class UInputAction* LookAction;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-    UAttributeComponent* AttributeComponent;
+    class UAttributeComponent* AttributeComponent;
 
-    UPROPERTY(BlueprintAssignable, Category="Events")
+    UPROPERTY(BlueprintAssignable, Category = "Events")
     FOnSprint OnSprint;
 
 protected:
@@ -83,7 +83,9 @@ protected:
     void StopCrouch(const FInputActionValue& Value);
 
     void StartSprint(const FInputActionValue& Value);
-    void StopSprint(const FInputActionValue& Value);
+
+public:
+    void StopSprint(const FInputActionValue& Value = FInputActionValue());
 
 protected:
     virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;

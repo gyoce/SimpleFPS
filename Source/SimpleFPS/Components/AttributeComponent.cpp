@@ -10,7 +10,6 @@ UAttributeComponent::UAttributeComponent()
     PrimaryComponentTick.bCanEverTick = true;
 
     Stamina = MaxStamina;
-    Health = MaxHealth;
 
     SetComponentTickInterval(1.0f);
 }
@@ -19,7 +18,7 @@ void UAttributeComponent::BeginPlay()
 {
     Super::BeginPlay();
 
-    ASimpleFPSCharacter* Character = Cast<ASimpleFPSCharacter>(GetOwner());
+    Character = Cast<ASimpleFPSCharacter>(GetOwner());
     if (Character != nullptr)
         Character->OnSprint.AddDynamic(this, &UAttributeComponent::HandleOnSprint);
     else
@@ -30,15 +29,35 @@ void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+    UE_LOG(LogTemp, Log, TEXT("Stamina: %.2f"), Stamina);
+
+    if (bIsExhausted)
+        return;
+
+    float LastStamina = Stamina;
+
     if (bIsSprinting)
         Stamina = FMath::Clamp(Stamina - StaminaConsumeRate, 0.0f, MaxStamina);
     else
         Stamina = FMath::Clamp(Stamina + StaminaRegenRate, 0.0f, MaxStamina);
 
-    UE_LOG(LogTemp, Log, TEXT("Stamina: %.2f"), Stamina);
+    if (!FMath::IsNearlyEqual(LastStamina, Stamina))
+        OnStaminaChanged.Broadcast(Stamina);
+
+    if (Stamina <= 0.0f)
+    {
+        bIsExhausted = true;
+        Character->StopSprint();
+        GetWorld()->GetTimerManager().SetTimer(ClearExhaustionTimerHandle, this, &UAttributeComponent::ClearExhaustion, StaminaClearExhaustionTime, false);
+    }
 }
 
 void UAttributeComponent::HandleOnSprint(bool IsSprinting)
 {
     bIsSprinting = IsSprinting;
+}
+
+void UAttributeComponent::ClearExhaustion()
+{
+    bIsExhausted = false;
 }
