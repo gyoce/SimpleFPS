@@ -8,11 +8,8 @@
 UCLASS(minimalapi)
 class ASimpleFPSGameMode : public AGameModeBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	ASimpleFPSGameMode();
+    ASimpleFPSGameMode();
 };
-
-
-

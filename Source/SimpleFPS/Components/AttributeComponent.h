@@ -8,26 +8,26 @@
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SIMPLEFPS_API UAttributeComponent : public UActorComponent
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
-	UAttributeComponent();
+    // Sets default values for this component's properties
+    UAttributeComponent();
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+    // Called when the game starts
+    virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+    // Called every frame
+    virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Attributes")
-	float Stamina;
+    float Stamina;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Attributes")
-	float Health;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Attributes")
+    float Health;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Attributes")
     float MaxStamina = 100.0f;
@@ -35,15 +35,15 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Attributes")
     float MaxHealth = 100.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attributes")
-	float StaminaRegenRate = 5.0f;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attributes")
+    float StaminaRegenRate = 5.0f;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attributes")
     float StaminaConsumeRate = 10.0f;
 
 private:
-	UFUNCTION()
+    UFUNCTION()
     void HandleOnSprint(bool IsSprinting);
-	
-	bool bIsSprinting = false;
+    
+    bool bIsSprinting = false;
 };
