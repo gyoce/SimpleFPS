@@ -1,6 +1,4 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
-
 #include "SimpleFPSPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"

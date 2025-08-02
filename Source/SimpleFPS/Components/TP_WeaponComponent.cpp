@@ -1,9 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
-
 #include "TP_WeaponComponent.h"
-#include "SimpleFPSCharacter.h"
-#include "SimpleFPSProjectile.h"
+#include "../Characters/SimpleFPSCharacter.h"
+#include "../Actors/SimpleFPSProjectile.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Kismet/GameplayStatics.h"

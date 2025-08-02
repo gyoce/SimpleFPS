@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "SimpleFPSCharacter.h"
-#include "SimpleFPSProjectile.h"
+#include "../Actors/SimpleFPSProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -11,7 +10,7 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include <Kismet/GameplayStatics.h>
+#include "Kismet/GameplayStatics.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -31,6 +30,8 @@ ASimpleFPSCharacter::ASimpleFPSCharacter()
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
 }
 
 void ASimpleFPSCharacter::BeginPlay()
@@ -116,10 +117,14 @@ void ASimpleFPSCharacter::StopCrouch(const FInputActionValue&)
 
 void ASimpleFPSCharacter::StartSprint(const FInputActionValue&)
 {
-    GetCharacterMovement()->MaxWalkSpeed = SprintSpeed; 
+    GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+    bIsSprinting = true;
+	OnSprint.Broadcast(bIsSprinting);
 }
 
 void ASimpleFPSCharacter::StopSprint(const FInputActionValue&)
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+    bIsSprinting = false;
+	OnSprint.Broadcast(bIsSprinting);
 }

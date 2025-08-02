@@ -1,10 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/SphereComponent.h"
-#include "SimpleFPSCharacter.h"
+#include "../Characters/SimpleFPSCharacter.h"
 #include "TP_PickUpComponent.generated.h"
 
 // Declaration of the delegate that will be called when someone picks this up
