@@ -50,8 +50,14 @@ void ASimpleFPSCharacter::BeginPlay()
         UE_LOG(LogTemp, Error, TEXT("Failed to start camera shake instance."));
 
     GunActor = Cast<AGun>(Gun->GetChildActor());
-    if (GunActor == nullptr)
-        UE_LOG(LogTemp, Error, TEXT("Can't cast Gun child actor to AGun"));
+    if (GunActor != nullptr)
+    {   
+        GunActor->SetOwner(this);
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to cast Gun child actor to AGun"));
+    }
 }
 
 void ASimpleFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

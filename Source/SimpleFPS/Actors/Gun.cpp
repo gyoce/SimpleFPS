@@ -53,8 +53,17 @@ void AGun::PullTrigger()
         FVector CameraForwardWithRange = PlayerCameraManager->GetActorForwardVector() * Range;
         FVector EndPoint = CameraLocation + CameraForwardWithRange;
 
-        bool bHit = GetWorld()->LineTraceTestByChannel(CameraLocation, EndPoint, ECollisionChannel::ECC_Visibility);
-        DrawDebugLine(GetWorld(), CameraLocation, EndPoint, FColor::Red, true);
+        FHitResult Hit;
+        FCollisionQueryParams CollisionParams;
+        CollisionParams.AddIgnoredActor(this);
+        CollisionParams.AddIgnoredActor(GetOwner());
+        bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, EndPoint, ECollisionChannel::ECC_GameTraceChannel2, CollisionParams);
+        DrawDebugLine(GetWorld(), CameraLocation, EndPoint, FColor::Green, true);
+        if (bHit)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("HIT HIT HIT HIT %s -> %s"), *CameraLocation.ToString(), *Hit.Location.ToString());
+            DrawDebugLine(GetWorld(), CameraLocation, Hit.Location, FColor::Red, true);
+        }
     }
 }
 
