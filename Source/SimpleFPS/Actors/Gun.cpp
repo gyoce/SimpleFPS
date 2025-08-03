@@ -1,6 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "Gun.h"
 
+#include "../Characters/SimpleFPSCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+
 // Sets default values
 AGun::AGun()
 {
@@ -23,11 +27,39 @@ AGun::AGun()
 void AGun::BeginPlay()
 {
     Super::BeginPlay();
+    CurrentAmmo = MaxAmmo;
 }
 
 // Called every frame
 void AGun::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
+}
+
+void AGun::PullTrigger()
+{
+    if (CanFireGun())
+    {
+        APlayerCameraManager* PlayerCameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+        if (PlayerCameraManager == nullptr)
+        {
+            UE_LOG(LogTemp, Error, TEXT("PlayerCameraManager is null in AGun::PullTrigger"));
+            return;
+        }
+
+        UE_LOG(LogTemp, Warning, TEXT("Fire!"));
+
+        FVector CameraLocation = PlayerCameraManager->GetCameraLocation();
+        FVector CameraForwardWithRange = PlayerCameraManager->GetActorForwardVector() * Range;
+        FVector EndPoint = CameraLocation + CameraForwardWithRange;
+
+        bool bHit = GetWorld()->LineTraceTestByChannel(CameraLocation, EndPoint, ECollisionChannel::ECC_Visibility);
+        DrawDebugLine(GetWorld(), CameraLocation, EndPoint, FColor::Red, true);
+    }
+}
+
+bool AGun::CanFireGun() const
+{
+    return CurrentAmmo > 0;
 }
 

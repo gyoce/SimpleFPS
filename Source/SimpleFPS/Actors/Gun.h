@@ -22,6 +22,9 @@ public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
 
+    UFUNCTION(BlueprintCallable)
+    void PullTrigger();
+
 private:
     UPROPERTY(VisibleAnywhere)
     USceneComponent* Root;
@@ -31,4 +34,18 @@ private:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* GunMagazine;
+
+    UPROPERTY(EditAnywhere)
+    int CurrentAmmo;
+
+    UPROPERTY(EditAnywhere)
+    int MaxAmmo = 30;
+
+    UPROPERTY(EditAnywhere)
+    float Damage = 20;
+
+    UPROPERTY(EditAnywhere)
+    float Range = 10000.0f;
+
+    bool CanFireGun() const;
 };

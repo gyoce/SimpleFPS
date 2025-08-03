@@ -12,6 +12,7 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "../Actors/Gun.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -21,7 +22,7 @@ ASimpleFPSCharacter::ASimpleFPSCharacter()
         
     FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
     FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-    FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
+    FirstPersonCameraComponent->SetRelativeLocation(FVector(-30.f, 0.f, 60.f)); // Position the camera
     FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
     // Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
@@ -30,7 +31,7 @@ ASimpleFPSCharacter::ASimpleFPSCharacter()
     Mesh1P->SetupAttachment(FirstPersonCameraComponent);
     Mesh1P->bCastDynamicShadow = false;
     Mesh1P->CastShadow = false;
-    Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+    Mesh1P->SetRelativeLocation(FVector(-10.f, 0.f, -150.f));
 
     Gun = CreateDefaultSubobject<UChildActorComponent>(TEXT("Gun"));
     Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
@@ -47,6 +48,10 @@ void ASimpleFPSCharacter::BeginPlay()
         CameraShakeStepInstance->ShakeScale = 0.0f;
     else
         UE_LOG(LogTemp, Error, TEXT("Failed to start camera shake instance."));
+
+    GunActor = Cast<AGun>(Gun->GetChildActor());
+    if (GunActor == nullptr)
+        UE_LOG(LogTemp, Error, TEXT("Can't cast Gun child actor to AGun"));
 }
 
 void ASimpleFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -69,6 +74,8 @@ void ASimpleFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
         EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ASimpleFPSCharacter::StartSprint);
         EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ASimpleFPSCharacter::StopSprint);
         EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &ASimpleFPSCharacter::StopSprint);
+
+        EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Started, this, &ASimpleFPSCharacter::Shoot);
     }
     else
     {
@@ -131,4 +138,10 @@ void ASimpleFPSCharacter::StopSprint(const FInputActionValue&)
     GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
     bIsSprinting = false;
     OnSprint.Broadcast(bIsSprinting);
+}
+
+void ASimpleFPSCharacter::Shoot(const FInputActionValue&)
+{
+    if (GunActor)
+        GunActor->PullTrigger();
 }

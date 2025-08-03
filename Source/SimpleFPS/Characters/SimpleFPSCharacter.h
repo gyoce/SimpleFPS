@@ -54,6 +54,10 @@ private:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     UInputAction* SprintAction;
 
+    /** Shoot Input Action */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UInputAction* ShootAction;
+
     UPROPERTY(EditAnywhere)
     float SprintSpeed = 900.0f;
 
@@ -88,6 +92,8 @@ protected:
 
     void StartSprint(const FInputActionValue& Value);
 
+    void Shoot(const FInputActionValue& Value);
+
 public:
     void StopSprint(const FInputActionValue& Value = FInputActionValue());
 
@@ -101,7 +107,12 @@ public:
     UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 private:
+    UPROPERTY()
     UCameraShakeBase* CameraShakeStepInstance;
+    
     bool bIsSprinting = false;
+
+    UPROPERTY()
+    class AGun* GunActor;
 };
 
