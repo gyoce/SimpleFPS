@@ -43,7 +43,7 @@ private:
     UInputAction* JumpAction;
 
     /** Move Input Action */
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess="true"))
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta=(AllowPrivateAccess = "true"))
     UInputAction* MoveAction;
 
     /** Crouch Input Action */

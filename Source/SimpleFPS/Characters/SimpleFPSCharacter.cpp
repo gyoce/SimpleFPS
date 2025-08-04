@@ -44,16 +44,12 @@ void ASimpleFPSCharacter::BeginPlay()
     Super::BeginPlay();
 
     CameraShakeStepInstance = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->StartCameraShake(CameraShakeStep, 1.0f);
-    if (CameraShakeStepInstance)
-        CameraShakeStepInstance->ShakeScale = 0.0f;
-    else
-        UE_LOG(LogTemp, Error, TEXT("Failed to start camera shake instance."));
+    check(CameraShakeStepInstance);
+    CameraShakeStepInstance->ShakeScale = 0.0f;
 
     GunActor = Cast<AGun>(Gun->GetChildActor());
-    if (GunActor != nullptr)
-        GunActor->SetOwner(this);
-    else
-        UE_LOG(LogTemp, Error, TEXT("Failed to cast Gun child actor to AGun"));
+    check(GunActor);
+    GunActor->SetOwner(this);
 }
 
 void ASimpleFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -94,15 +90,13 @@ void ASimpleFPSCharacter::Move(const FInputActionValue& Value)
         AddMovementInput(GetActorForwardVector(), MovementVector.Y);
         AddMovementInput(GetActorRightVector(), MovementVector.X);
 
-        if (CameraShakeStepInstance)
-            CameraShakeStepInstance->ShakeScale = GetCharacterMovement()->IsFalling() ? 0.0f : 1.0f;
+        CameraShakeStepInstance->ShakeScale = GetCharacterMovement()->IsFalling() ? 0.0f : 1.0f;
     }
 }
 
 void ASimpleFPSCharacter::StopMove(const FInputActionValue& Value)
 {
-    if (CameraShakeStepInstance)
-        CameraShakeStepInstance->ShakeScale = 0.0f;
+    CameraShakeStepInstance->ShakeScale = 0.0f;        
 }
 
 void ASimpleFPSCharacter::Look(const FInputActionValue& Value)
@@ -144,6 +138,5 @@ void ASimpleFPSCharacter::StopSprint(const FInputActionValue&)
 
 void ASimpleFPSCharacter::Shoot(const FInputActionValue&)
 {
-    if (GunActor)
-        GunActor->PullTrigger();
+    GunActor->PullTrigger();
 }

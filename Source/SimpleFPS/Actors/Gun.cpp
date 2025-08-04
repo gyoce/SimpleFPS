@@ -6,6 +6,8 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/DamageEvents.h"
 
+static const ECollisionChannel BulletChannel = ECollisionChannel::ECC_GameTraceChannel2;
+
 // Sets default values
 AGun::AGun()
 {
@@ -59,7 +61,7 @@ void AGun::PullTrigger()
     FVector EndPoint = StartPoint + StartPointWithRange;
 
     FHitResult Hit;
-    bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, StartPoint, EndPoint, ECollisionChannel::ECC_GameTraceChannel2, CollisionQueryParams);
+    bool bHit = GetWorld()->LineTraceSingleByChannel(Hit, StartPoint, EndPoint, BulletChannel, CollisionQueryParams);
     DrawDebugLine(GetWorld(), StartPoint, EndPoint, FColor::Green, true);
     if (bHit)
     {
