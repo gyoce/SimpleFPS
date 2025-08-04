@@ -51,13 +51,9 @@ void ASimpleFPSCharacter::BeginPlay()
 
     GunActor = Cast<AGun>(Gun->GetChildActor());
     if (GunActor != nullptr)
-    {   
         GunActor->SetOwner(this);
-    }
     else
-    {
         UE_LOG(LogTemp, Error, TEXT("Failed to cast Gun child actor to AGun"));
-    }
 }
 
 void ASimpleFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

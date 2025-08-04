@@ -47,5 +47,12 @@ private:
     UPROPERTY(EditAnywhere)
     float Range = 10000.0f;
 
+    // Cache variables
+    class APlayerCameraManager* PlayerCameraManager;
+    struct FCollisionQueryParams CollisionQueryParams;
+    AController* OwnerController = nullptr;
+
+    AController* GetOwnerController();
+
     bool CanFireGun() const;
 };
