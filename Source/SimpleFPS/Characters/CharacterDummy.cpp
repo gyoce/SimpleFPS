@@ -41,6 +41,14 @@ float ACharacterDummy::TakeDamage(float Damage, FDamageEvent const& DamageEvent,
     DamageWidget = Cast<UDamageUserWidget>(UserDamageWidget);
     check(DamageWidget);
 
+    if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+    {
+        const FPointDamageEvent* PointDamageEvent = static_cast<const FPointDamageEvent*>(&DamageEvent);
+        check(PointDamageEvent);
+        UE_LOG(LogTemp, Warning, TEXT("Bone name hit : %s"), *PointDamageEvent->HitInfo.BoneName.ToString());
+        Damage *= GetDamageBoneModifier(PointDamageEvent->HitInfo.BoneName);
+    }
+
     FVector2D ScreenPosition;
     FVector RandomLocation = GetActorLocation() + FMath::VRand() * FMath::FRandRange(0, 50.0f);
     UGameplayStatics::ProjectWorldToScreen(PlayerController, RandomLocation, ScreenPosition);
@@ -49,4 +57,10 @@ float ACharacterDummy::TakeDamage(float Damage, FDamageEvent const& DamageEvent,
     DamageWidget->AddToViewport();
 
     return Damage;
+}
+
+float ACharacterDummy::GetDamageBoneModifier(const FName& BoneName)
+{
+    float* Value = BoneDamageModifiers.Find(BoneName);
+    return Value == nullptr ? 1.0f : *Value;
 }

@@ -3,10 +3,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "../CombatInterface.h"
 #include "CharacterDummy.generated.h"
 
 UCLASS()
-class SIMPLEFPS_API ACharacterDummy : public ACharacter
+class SIMPLEFPS_API ACharacterDummy : public ACharacter, public ICombatInterface
 {
     GENERATED_BODY()
 
@@ -28,9 +29,15 @@ public:
     virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 private:
+    virtual float GetDamageBoneModifier(const FName& BoneName) override;
+
+private:
     UPROPERTY(EditAnywhere)
     TSubclassOf<class UUserWidget> DamageWidgetClass;
 
     UPROPERTY()
     class UDamageUserWidget* DamageWidget;
+
+    UPROPERTY(EditAnywhere)
+    TMap<FName, float> BoneDamageModifiers;
 };
