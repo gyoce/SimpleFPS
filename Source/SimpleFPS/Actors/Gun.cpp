@@ -2,16 +2,16 @@
 #include "Gun.h"
 
 #include "../Characters/SimpleFPSCharacter.h"
+#include "../Components/AttributeComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/DamageEvents.h"
 
 static const ECollisionChannel BulletChannel = ECollisionChannel::ECC_GameTraceChannel2;
 
-// Sets default values
 AGun::AGun()
 {
-    // Set this actor to call Tick() every frame. You can turn this off to improve performance if you don't need it.
     PrimaryActorTick.bCanEverTick = true;
 
     Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
@@ -28,7 +28,6 @@ AGun::AGun()
     CollisionQueryParams.AddIgnoredActor(this);
 }
 
-// Called when the game starts or when spawned
 void AGun::BeginPlay()
 {
     Super::BeginPlay();
@@ -36,14 +35,14 @@ void AGun::BeginPlay()
     CurrentAmmo = MaxAmmo;
 
     PlayerCameraManager = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-    if (PlayerCameraManager == nullptr)
-    {
-        UE_LOG(LogTemp, Error, TEXT("PlayerCameraManager is null in AGun::BeginPlay"));
-        return;
-    }
+    check(PlayerCameraManager);
+
+    AActor* ParentActor = GetParentActor();
+    check(ParentActor);
+    PlayersAttribute = ParentActor->GetComponentByClass<UAttributeComponent>();
+    check(PlayersAttribute);
 }
 
-// Called every frame
 void AGun::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -66,15 +65,24 @@ void AGun::PullTrigger()
     if (bHit)
     {
         UE_LOG(LogTemp, Warning, TEXT("HIT!"));
+        float DamageToApply = ComputeDamage();
         DrawDebugLine(GetWorld(), StartPoint, Hit.Location, FColor::Red, true);
         AActor* HitActor = Hit.GetActor();
         if (HitActor)
         {
             FVector HitDirection = (Hit.TraceEnd - Hit.TraceStart).GetSafeNormal();
-            FPointDamageEvent DamageEvent(Damage, Hit, HitDirection, nullptr);
-            HitActor->TakeDamage(Damage, DamageEvent, GetOwnerController(), this);
+            FPointDamageEvent DamageEvent(DamageToApply, Hit, HitDirection, nullptr);
+            HitActor->TakeDamage(DamageToApply, DamageEvent, GetOwnerController(), this);
         }
     }
+}
+
+float AGun::ComputeDamage()
+{
+    float DamageToApply = Damage;
+    DamageToApply *= (UKismetMathLibrary::NormalizeToRange(PlayersAttribute->Strength, 0.0f, 255.0f) + 1.0f);
+    DamageToApply = UKismetMathLibrary::Lerp(Damage * 0.95f, Damage * 1.05f, FMath::FRand());
+    return DamageToApply;
 }
 
 AController* AGun::GetOwnerController()

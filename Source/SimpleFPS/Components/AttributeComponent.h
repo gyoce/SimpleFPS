@@ -43,6 +43,9 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attributes")
     float StaminaClearExhaustionTime = 3.0f;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Attributes")
+    float Strength = 100.0f;
+
 private:
     UFUNCTION()
     void HandleOnSprint(bool IsSprinting);

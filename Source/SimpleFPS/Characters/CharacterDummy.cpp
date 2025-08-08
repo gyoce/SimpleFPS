@@ -6,27 +6,25 @@
 #include "../UI/DamageUserWidget.h"
 #include "Engine/DamageEvents.h"
 #include "Components/TextBlock.h"
+#include "../Components/CombatComponent.h"
 
-// Sets default values
 ACharacterDummy::ACharacterDummy()
 {
-    // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bCanEverTick = false;
+
+    CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 }
 
-// Called when the game starts or when spawned
 void ACharacterDummy::BeginPlay()
 {
     Super::BeginPlay();
 }
 
-// Called every frame
 void ACharacterDummy::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 }
 
-// Called to bind functionality to input
 void ACharacterDummy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -61,6 +59,6 @@ float ACharacterDummy::TakeDamage(float Damage, FDamageEvent const& DamageEvent,
 
 float ACharacterDummy::GetDamageBoneModifier(const FName& BoneName)
 {
-    float* Value = BoneDamageModifiers.Find(BoneName);
+    float* Value = CombatComponent->BoneDamageModifiers.Find(BoneName);
     return Value == nullptr ? 1.0f : *Value;
 }

@@ -53,3 +53,5 @@ Session.vim
 !/Res/**
 !/README.md
 !/img/**
+!.editorconfig
+!shadertoolsconfig.json

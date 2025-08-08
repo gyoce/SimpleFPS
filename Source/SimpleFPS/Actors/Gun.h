@@ -26,6 +26,9 @@ public:
     void PullTrigger();
 
 private:
+    float ComputeDamage();
+
+private:
     UPROPERTY(VisibleAnywhere)
     USceneComponent* Root;
 
@@ -51,6 +54,7 @@ private:
     class APlayerCameraManager* PlayerCameraManager;
     struct FCollisionQueryParams CollisionQueryParams;
     AController* OwnerController = nullptr;
+    class UAttributeComponent* PlayersAttribute;
 
     AController* GetOwnerController();
 

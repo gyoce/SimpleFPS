@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "../CombatInterface.h"
+#include "../Interfaces/CombatInterface.h"
 #include "CharacterDummy.generated.h"
 
 UCLASS()
@@ -28,6 +28,9 @@ public:
 
     virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+    class UCombatComponent* CombatComponent;
+
 private:
     virtual float GetDamageBoneModifier(const FName& BoneName) override;
 
@@ -37,7 +40,4 @@ private:
 
     UPROPERTY()
     class UDamageUserWidget* DamageWidget;
-
-    UPROPERTY(EditAnywhere)
-    TMap<FName, float> BoneDamageModifiers;
 };
