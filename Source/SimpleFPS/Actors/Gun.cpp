@@ -39,6 +39,9 @@ void AGun::BeginPlay()
 
     AActor* ParentActor = GetParentActor();
     check(ParentActor);
+    ParentFpsCharacter = Cast<ASimpleFPSCharacter>(ParentActor);
+    check(ParentFpsCharacter);
+
     PlayersAttribute = ParentActor->GetComponentByClass<UAttributeComponent>();
     check(PlayersAttribute);
 }
@@ -52,8 +55,10 @@ void AGun::PullTrigger()
 {
     if (!CanFireGun())
         return;
+    UE_LOG(LogTemp, Warning, TEXT("Gun class at runtime: %s"), *GetClass()->GetName());
 
     UE_LOG(LogTemp, Warning, TEXT("Fire!"));
+    OnGunFired();
 
     FVector StartPoint = PlayerCameraManager->GetCameraLocation();
     FVector StartPointWithRange = PlayerCameraManager->GetActorForwardVector() * Range;
@@ -90,23 +95,11 @@ AController* AGun::GetOwnerController()
     if (OwnerController)
         return OwnerController;
 
-    if (GetOwner() == nullptr)
-    {
-        UE_LOG(LogTemp, Error, TEXT("GetOwner is null in AGun::GetOwnerController"));
-        return nullptr;
-    }
+    check(GetOwner());
     APawn* OwnerPawn = Cast<APawn>(GetOwner());
-    if (OwnerPawn == nullptr)
-    {
-        UE_LOG(LogTemp, Error, TEXT("OwnerPawn is null in AGun::GetOwnerController"));
-        return nullptr;
-    }
+    check(OwnerPawn);
     OwnerController = OwnerPawn->GetController();
-    if (OwnerController == nullptr)
-    {
-        UE_LOG(LogTemp, Error, TEXT("OwnerController is null in AGun::GetOwnerController"));
-        return nullptr;
-    }
+    check(OwnerController);
 
     CollisionQueryParams.AddIgnoredActor(GetOwner());
 
@@ -117,4 +110,3 @@ bool AGun::CanFireGun() const
 {
     return CurrentAmmo > 0;
 }
-

@@ -1,4 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
 
 #include "CoreMinimal.h"
@@ -11,25 +10,24 @@ class SIMPLEFPS_API AGun : public AActor
     GENERATED_BODY()
     
 public:	
-    // Sets default values for this actor's properties
     AGun();
 
 protected:
-    // Called when the game starts or when spawned
     virtual void BeginPlay() override;
 
 public:	
-    // Called every frame
     virtual void Tick(float DeltaTime) override;
 
-    UFUNCTION(BlueprintCallable)
     void PullTrigger();
+
+    UFUNCTION(BlueprintImplementableEvent, Category = Gun)
+    void OnGunFired();
 
 private:
     float ComputeDamage();
 
 private:
-    UPROPERTY(VisibleAnywhere)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     USceneComponent* Root;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
@@ -38,25 +36,27 @@ private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
     UStaticMeshComponent* GunMagazine;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = Gun)
     int CurrentAmmo;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = Gun)
     int MaxAmmo = 30;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = Gun)
     float Damage = 20;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Category = Gun)
     float Range = 10000.0f;
 
-    // Cache variables
-    class APlayerCameraManager* PlayerCameraManager;
+    UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+    class ASimpleFPSCharacter* ParentFpsCharacter = nullptr;
+
+    class APlayerCameraManager* PlayerCameraManager = nullptr;
     struct FCollisionQueryParams CollisionQueryParams;
     AController* OwnerController = nullptr;
-    class UAttributeComponent* PlayersAttribute;
+
+    class UAttributeComponent* PlayersAttribute = nullptr;
 
     AController* GetOwnerController();
-
     bool CanFireGun() const;
 };
