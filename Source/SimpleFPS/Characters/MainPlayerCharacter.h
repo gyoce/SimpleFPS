@@ -42,6 +42,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* SwitchCameraAction;
+
 	void ConfigMesh();
 	void ConfigThirdPerson();
 	void ConfigFirstPerson();
@@ -49,4 +52,7 @@ private:
 	void Move(const FInputActionValue& Value);
 	void StopMove(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void SwitchCamera(const FInputActionValue& Value);
+
+	bool bIsFirstPersonCamera = true;
 };

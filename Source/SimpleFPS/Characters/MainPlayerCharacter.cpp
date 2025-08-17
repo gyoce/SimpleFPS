@@ -71,6 +71,8 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopMove);
 
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Look);
+
+        EnhancedInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::SwitchCamera);
     } 
     else
     {
@@ -103,4 +105,12 @@ void AMainPlayerCharacter::Look(const FInputActionValue& Value)
         AddControllerYawInput(LookAxisVector.X);
         AddControllerPitchInput(LookAxisVector.Y);
     }
+}
+
+void AMainPlayerCharacter::SwitchCamera(const FInputActionValue& Value)
+{
+    bIsFirstPersonCamera = !bIsFirstPersonCamera;
+
+    FirstPersonCameraComponent->SetActive(bIsFirstPersonCamera);
+    ThirdPersonCameraComponent->SetActive(!bIsFirstPersonCamera);        
 }
