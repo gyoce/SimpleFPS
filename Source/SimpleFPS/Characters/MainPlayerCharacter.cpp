@@ -6,6 +6,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "EnhancedInputSubsystems.h"
+#include "../Actors/WeaponPickup.h"
+#include "../Components/WeaponMaster.h"
 
 AMainPlayerCharacter::AMainPlayerCharacter()
 {
@@ -73,11 +75,31 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Look);
 
         EnhancedInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::SwitchCamera);
+
+        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Interact);
     } 
     else
     {
         UE_LOG(LogTemp, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
     }
+}
+
+void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<class UWeaponMaster>& WeaponToSpawn, FVector PickupLocation)
+{
+    if (CurrentWeapon != nullptr)
+    {
+        PickupLocation.Z += 10.f;
+        FTransform SpawnTransform;
+        SpawnTransform.SetLocation(PickupLocation);
+        FActorSpawnParameters SpawnParameters;
+        SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+        GetWorld()->SpawnActor<AWeaponPickup>(CurrentWeapon->GetPickupClass(), SpawnTransform, SpawnParameters);
+        CurrentWeapon->DestroyComponent();
+    }
+
+    CurrentWeapon = Cast<UWeaponMaster>(AddComponentByClass(WeaponToSpawn, false, FTransform::Identity, false));
+    CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, CurrentWeapon->GetSocketName());
 }
 
 void AMainPlayerCharacter::Move(const FInputActionValue& Value)
@@ -91,7 +113,7 @@ void AMainPlayerCharacter::Move(const FInputActionValue& Value)
     }
 }
 
-void AMainPlayerCharacter::StopMove(const FInputActionValue& Value)
+void AMainPlayerCharacter::StopMove(const FInputActionValue&)
 {
     
 }
@@ -107,10 +129,22 @@ void AMainPlayerCharacter::Look(const FInputActionValue& Value)
     }
 }
 
-void AMainPlayerCharacter::SwitchCamera(const FInputActionValue& Value)
+void AMainPlayerCharacter::SwitchCamera(const FInputActionValue&)
 {
     bIsFirstPersonCamera = !bIsFirstPersonCamera;
 
     FirstPersonCameraComponent->SetActive(bIsFirstPersonCamera);
     ThirdPersonCameraComponent->SetActive(!bIsFirstPersonCamera);        
+}
+
+void AMainPlayerCharacter::Interact(const FInputActionValue&)
+{
+    TArray<AActor*> Result;
+    GetOverlappingActors(Result, AWeaponPickup::StaticClass());
+
+    if (Result.IsEmpty())
+        return;
+
+    AWeaponPickup* FirstResult = Cast<AWeaponPickup>(Result[0]);
+    FirstResult->Interact(this);
 }
