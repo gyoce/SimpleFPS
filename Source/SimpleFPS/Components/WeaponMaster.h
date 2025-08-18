@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "../Enums/WeaponName.h"
 #include "../Enums/WeaponType.h"
 #include "../Enums/FireMode.h"
@@ -10,7 +10,7 @@
 class AWeaponPickup;
 
 UCLASS()
-class SIMPLEFPS_API UWeaponMaster : public UStaticMeshComponent
+class SIMPLEFPS_API UWeaponMaster : public USkeletalMeshComponent
 {
     GENERATED_BODY()
 
@@ -39,4 +39,7 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
     FName SocketName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+    UAnimSequence* FiringAnimation;
 };
