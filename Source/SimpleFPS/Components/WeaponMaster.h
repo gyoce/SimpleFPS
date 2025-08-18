@@ -4,7 +4,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "../Enums/WeaponName.h"
 #include "../Enums/WeaponType.h"
-#include "../Enums/FireMode.h"
+#include "../Enums/WeaponClass.h"
 #include "WeaponMaster.generated.h"
 
 class AWeaponPickup;
@@ -37,6 +37,9 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
     EWeaponName WeaponName;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+    EWeaponClass WeaponClass;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
     TSubclassOf<AWeaponPickup> PickupClass;
