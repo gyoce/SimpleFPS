@@ -52,6 +52,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* ShootAction;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UWeaponMaster* CurrentWeapon = nullptr;
 
@@ -65,6 +68,7 @@ private:
 	void Move(const FInputActionValue& Value);
 	void StopMove(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Shoot(const FInputActionValue& Value);
 	void SwitchCamera(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
 

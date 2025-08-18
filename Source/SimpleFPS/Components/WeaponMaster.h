@@ -20,6 +20,10 @@ public:
     TSubclassOf<AWeaponPickup> GetPickupClass() const { return PickupClass; }
     FName GetSocketName() const { return SocketName; }
     EWeaponName GetWeaponName() const { return WeaponName; }
+    UAnimSequence* GetFiringAnimation() const { return FiringAnimation; }
+    float GetRange() const { return Range; }
+
+    static const FName BarrelSocketName;
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))

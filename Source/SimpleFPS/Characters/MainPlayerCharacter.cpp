@@ -6,6 +6,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "EnhancedInputSubsystems.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "../Actors/WeaponPickup.h"
 #include "../Components/WeaponMaster.h"
 
@@ -74,10 +76,12 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Look);
 
+        EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Shoot);
+
         EnhancedInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::SwitchCamera);
 
         EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Interact);
-    } 
+    }
     else
     {
         UE_LOG(LogTemp, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
@@ -127,6 +131,28 @@ void AMainPlayerCharacter::Look(const FInputActionValue& Value)
     {
         AddControllerYawInput(LookAxisVector.X);
         AddControllerPitchInput(LookAxisVector.Y);
+    }
+}
+
+void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
+{
+    if (CurrentWeapon == nullptr)
+        return;
+
+    CurrentWeapon->PlayAnimation(CurrentWeapon->GetFiringAnimation(), false);
+
+    FTransform SocketTransform = CurrentWeapon->GetSocketTransform(UWeaponMaster::BarrelSocketName);
+    FVector Start = SocketTransform.GetLocation();
+    FVector End = Start + SocketTransform.GetRotation().GetForwardVector() * CurrentWeapon->GetRange();
+    FHitResult HitResult;
+    FCollisionQueryParams CollisionQueryParams;
+    CollisionQueryParams.bTraceComplex = true;
+    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionQueryParams);
+    DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.0f);
+
+    if (bHit)
+    {
+        DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(5.f), FColor::Red, false, 2.0f);
     }
 }
 
