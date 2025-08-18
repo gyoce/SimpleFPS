@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
+#include "../Enums/WeaponName.h"
 #include "MainPlayerCharacter.generated.h"
 
 class USkeletalMeshComponent;
@@ -21,7 +22,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	void SpawnWeapon(TSubclassOf<class UWeaponMaster>& WeaponToSpawn, FVector PickupLocation);
+	void SpawnWeapon(TSubclassOf<class UWeaponMaster> WeaponToSpawn, FVector PickupLocation);
 
 protected:
 	virtual void BeginPlay() override;
@@ -53,6 +54,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UWeaponMaster* CurrentWeapon = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	EWeaponName CurrentWeaponName;
 
 	void ConfigMesh();
 	void ConfigThirdPerson();

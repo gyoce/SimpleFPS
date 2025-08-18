@@ -84,13 +84,13 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
     }
 }
 
-void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<class UWeaponMaster>& WeaponToSpawn, FVector PickupLocation)
+void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<class UWeaponMaster> WeaponToSpawn, FVector PickupLocation)
 {
     if (CurrentWeapon != nullptr)
     {
         PickupLocation.Z += 10.f;
-        FTransform SpawnTransform;
-        SpawnTransform.SetLocation(PickupLocation);
+        FVector SpawnLocation = GetActorLocation() + GetActorTransform().GetRotation().GetForwardVector() * 50.f;
+        FTransform SpawnTransform(SpawnLocation);
         FActorSpawnParameters SpawnParameters;
         SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
@@ -100,6 +100,7 @@ void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<class UWeaponMaster>& WeaponT
 
     CurrentWeapon = Cast<UWeaponMaster>(AddComponentByClass(WeaponToSpawn, false, FTransform::Identity, false));
     CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, CurrentWeapon->GetSocketName());
+    CurrentWeaponName = CurrentWeapon->GetWeaponName();
 }
 
 void AMainPlayerCharacter::Move(const FInputActionValue& Value)

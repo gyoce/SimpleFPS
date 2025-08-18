@@ -19,6 +19,7 @@ public:
 
     TSubclassOf<AWeaponPickup> GetPickupClass() const { return PickupClass; }
     FName GetSocketName() const { return SocketName; }
+    EWeaponName GetWeaponName() const { return WeaponName; }
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
