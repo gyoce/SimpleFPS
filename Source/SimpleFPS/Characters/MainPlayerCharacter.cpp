@@ -88,23 +88,31 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
     }
 }
 
-void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<class UWeaponMaster> WeaponToSpawn, FVector PickupLocation)
+void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<UWeaponMaster> WeaponToSpawn, FVector PickupLocation)
 {
-    if (CurrentWeapon != nullptr)
-    {
-        PickupLocation.Z += 10.f;
-        FVector SpawnLocation = GetActorLocation() + GetActorTransform().GetRotation().GetForwardVector() * 50.f;
-        FTransform SpawnTransform(SpawnLocation);
-        FActorSpawnParameters SpawnParameters;
-        SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+    CurrentWeaponClass = WeaponToSpawn->GetDefaultObject<UWeaponMaster>()->GetWeaponClass();
+    UWeaponMaster* WeaponMaster = GetWeaponOfClass(CurrentWeaponClass);
 
-        GetWorld()->SpawnActor<AWeaponPickup>(CurrentWeapon->GetPickupClass(), SpawnTransform, SpawnParameters);
-        CurrentWeapon->DestroyComponent();
-    }
+    if (WeaponMaster != nullptr)
+        SpawnPickupWeapon(PickupLocation, WeaponMaster);
+ 
+    UWeaponMaster* NewWeaponMaster = Cast<UWeaponMaster>(AddComponentByClass(WeaponToSpawn, false, FTransform::Identity, false));
+    CurrentWeapons.Add({ CurrentWeaponClass, NewWeaponMaster });
+    NewWeaponMaster->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, NewWeaponMaster->GetSocketName());
 
-    CurrentWeapon = Cast<UWeaponMaster>(AddComponentByClass(WeaponToSpawn, false, FTransform::Identity, false));
-    CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, CurrentWeapon->GetSocketName());
-    CurrentWeaponName = CurrentWeapon->GetWeaponName();
+    HideAllWeaponsExceptCurrent();
+}
+
+void AMainPlayerCharacter::SpawnPickupWeapon(FVector& PickupLocation, UWeaponMaster* WeaponMaster)
+{
+    PickupLocation.Z += 10.f;
+    FVector SpawnLocation = GetActorLocation() + GetActorTransform().GetRotation().GetForwardVector() * 50.f;
+    FTransform SpawnTransform(SpawnLocation);
+    FActorSpawnParameters SpawnParameters;
+    SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+    GetWorld()->SpawnActor<AWeaponPickup>(WeaponMaster->GetPickupClass(), SpawnTransform, SpawnParameters);
+    WeaponMaster->DestroyComponent();
 }
 
 void AMainPlayerCharacter::Move(const FInputActionValue& Value)
@@ -136,6 +144,8 @@ void AMainPlayerCharacter::Look(const FInputActionValue& Value)
 
 void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
 {
+    UWeaponMaster* CurrentWeapon = GetCurrentWeapon();
+
     if (CurrentWeapon == nullptr)
         return;
 
@@ -151,9 +161,7 @@ void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
     DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.0f);
 
     if (bHit)
-    {
         DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(5.f), FColor::Red, false, 2.0f);
-    }
 }
 
 void AMainPlayerCharacter::SwitchCamera(const FInputActionValue&)
@@ -174,4 +182,22 @@ void AMainPlayerCharacter::Interact(const FInputActionValue&)
 
     AWeaponPickup* FirstResult = Cast<AWeaponPickup>(Result[0]);
     FirstResult->Interact(this);
+}
+
+UWeaponMaster* AMainPlayerCharacter::GetWeaponOfClass(EWeaponClass WeaponClass)
+{
+    UWeaponMaster** WeaponMaster = CurrentWeapons.Find(WeaponClass);
+    return WeaponMaster == nullptr ? nullptr : *WeaponMaster;
+}
+
+void AMainPlayerCharacter::HideAllWeaponsExceptCurrent()
+{
+    for (const auto& [_, Weapon] : CurrentWeapons)
+        Weapon->SetVisibility(Weapon->GetWeaponClass() == CurrentWeaponClass);
+}
+
+UWeaponMaster* AMainPlayerCharacter::GetCurrentWeapon()
+{
+    UWeaponMaster** WeaponMaster = CurrentWeapons.Find(CurrentWeaponClass);
+    return WeaponMaster == nullptr ? nullptr : *WeaponMaster;
 }

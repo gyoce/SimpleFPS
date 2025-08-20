@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
-#include "../Enums/WeaponName.h"
+#include "../Enums/WeaponClass.h"
 #include "MainPlayerCharacter.generated.h"
 
 class USkeletalMeshComponent;
@@ -23,6 +23,8 @@ public:
 
 	UFUNCTION()
 	void SpawnWeapon(TSubclassOf<class UWeaponMaster> WeaponToSpawn, FVector PickupLocation);
+
+	void SpawnPickupWeapon(FVector& PickupLocation, UWeaponMaster* WeaponMaster);
 
 protected:
 	virtual void BeginPlay() override;
@@ -56,10 +58,10 @@ private:
 	UInputAction* ShootAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	UWeaponMaster* CurrentWeapon = nullptr;
+	TMap<EWeaponClass, UWeaponMaster*> CurrentWeapons;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	EWeaponName CurrentWeaponName;
+	EWeaponClass CurrentWeaponClass;
 
 	void ConfigMesh();
 	void ConfigThirdPerson();
@@ -71,6 +73,12 @@ private:
 	void Shoot(const FInputActionValue& Value);
 	void SwitchCamera(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
+
+	UWeaponMaster* GetWeaponOfClass(EWeaponClass WeaponClass);
+	void HideAllWeaponsExceptCurrent();
+
+	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
+	UWeaponMaster* GetCurrentWeapon();
 
 	bool bIsFirstPersonCamera = true;
 };

@@ -22,6 +22,7 @@ public:
     EWeaponName GetWeaponName() const { return WeaponName; }
     UAnimSequence* GetFiringAnimation() const { return FiringAnimation; }
     float GetRange() const { return Range; }
+    EWeaponClass GetWeaponClass() const { return WeaponClass; }
 
     static const FName BarrelSocketName;
 
