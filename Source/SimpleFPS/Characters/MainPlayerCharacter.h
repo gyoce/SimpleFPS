@@ -26,6 +26,9 @@ public:
 
 	void SpawnPickupWeapon(FVector& PickupLocation, UWeaponMaster* WeaponMaster);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnSwitchingWeapon(EWeaponClass WeaponClass);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -88,10 +91,15 @@ private:
 
 	UWeaponMaster* GetWeaponOfClass(EWeaponClass WeaponClass);
 	void HideAllWeaponsExceptCurrent();
-	void SetCurrentWeapon(EWeaponClass WeaponClass);
 
 	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
 	UWeaponMaster* GetCurrentWeapon();
 
+	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
+	void SetCurrentWeapon(EWeaponClass WeaponClass);
+
 	bool bIsFirstPersonCamera = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool bCanFire = true;
 };

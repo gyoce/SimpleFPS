@@ -150,7 +150,7 @@ void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
 {
     UWeaponMaster* CurrentWeapon = GetCurrentWeapon();
 
-    if (CurrentWeapon == nullptr)
+    if (CurrentWeapon == nullptr || !bCanFire)
         return;
 
     CurrentWeapon->PlayAnimation(CurrentWeapon->GetFiringAnimation(), false);
@@ -190,17 +190,17 @@ void AMainPlayerCharacter::Interact(const FInputActionValue&)
 
 void AMainPlayerCharacter::EquipPrimaryWeapon(const FInputActionValue&)
 {
-    SetCurrentWeapon(EWeaponClass::Primary);
+    OnSwitchingWeapon(EWeaponClass::Primary);
 }
 
 void AMainPlayerCharacter::EquipSecondaryWeapon(const FInputActionValue&)
 {
-    SetCurrentWeapon(EWeaponClass::Secondary);
+    OnSwitchingWeapon(EWeaponClass::Secondary);
 }
 
 void AMainPlayerCharacter::EquipUnarmedWeapon(const FInputActionValue&)
 {
-    SetCurrentWeapon(EWeaponClass::Unarmed);
+    OnSwitchingWeapon(EWeaponClass::Unarmed);
 }
 
 UWeaponMaster* AMainPlayerCharacter::GetWeaponOfClass(EWeaponClass WeaponClass)
