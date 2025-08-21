@@ -57,6 +57,15 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* ShootAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* EquipPrimaryWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* EquipSecondaryWeaponAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* EquipUnarmedWeaponAction;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TMap<EWeaponClass, UWeaponMaster*> CurrentWeapons;
 
@@ -73,9 +82,13 @@ private:
 	void Shoot(const FInputActionValue& Value);
 	void SwitchCamera(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
+	void EquipPrimaryWeapon(const FInputActionValue& Value);
+	void EquipSecondaryWeapon(const FInputActionValue& Value);
+	void EquipUnarmedWeapon(const FInputActionValue& Value);
 
 	UWeaponMaster* GetWeaponOfClass(EWeaponClass WeaponClass);
 	void HideAllWeaponsExceptCurrent();
+	void SetCurrentWeapon(EWeaponClass WeaponClass);
 
 	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
 	UWeaponMaster* GetCurrentWeapon();

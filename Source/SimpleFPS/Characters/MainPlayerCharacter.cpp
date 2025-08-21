@@ -81,6 +81,10 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
         EnhancedInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::SwitchCamera);
 
         EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Interact);
+
+        EnhancedInputComponent->BindAction(EquipPrimaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipPrimaryWeapon);
+        EnhancedInputComponent->BindAction(EquipSecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipSecondaryWeapon);
+        EnhancedInputComponent->BindAction(EquipUnarmedWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipUnarmedWeapon);
     }
     else
     {
@@ -184,6 +188,21 @@ void AMainPlayerCharacter::Interact(const FInputActionValue&)
     FirstResult->Interact(this);
 }
 
+void AMainPlayerCharacter::EquipPrimaryWeapon(const FInputActionValue&)
+{
+    SetCurrentWeapon(EWeaponClass::Primary);
+}
+
+void AMainPlayerCharacter::EquipSecondaryWeapon(const FInputActionValue&)
+{
+    SetCurrentWeapon(EWeaponClass::Secondary);
+}
+
+void AMainPlayerCharacter::EquipUnarmedWeapon(const FInputActionValue&)
+{
+    SetCurrentWeapon(EWeaponClass::Unarmed);
+}
+
 UWeaponMaster* AMainPlayerCharacter::GetWeaponOfClass(EWeaponClass WeaponClass)
 {
     UWeaponMaster** WeaponMaster = CurrentWeapons.Find(WeaponClass);
@@ -194,6 +213,12 @@ void AMainPlayerCharacter::HideAllWeaponsExceptCurrent()
 {
     for (const auto& [_, Weapon] : CurrentWeapons)
         Weapon->SetVisibility(Weapon->GetWeaponClass() == CurrentWeaponClass);
+}
+
+void AMainPlayerCharacter::SetCurrentWeapon(EWeaponClass WeaponClass)
+{
+    CurrentWeaponClass = WeaponClass;
+    HideAllWeaponsExceptCurrent();
 }
 
 UWeaponMaster* AMainPlayerCharacter::GetCurrentWeapon()
