@@ -25,6 +25,7 @@ public:
     EWeaponClass GetWeaponClass() const { return WeaponClass; }
 
     static const FName BarrelSocketName;
+    static const FName LhikSocketName;
 
 protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))

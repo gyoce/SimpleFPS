@@ -221,6 +221,19 @@ void AMainPlayerCharacter::SetCurrentWeapon(EWeaponClass WeaponClass)
     HideAllWeaponsExceptCurrent();
 }
 
+FTransform AMainPlayerCharacter::GetLhikTransform()
+{
+    UWeaponMaster* CurrentWeapon = GetCurrentWeapon();
+    if (CurrentWeapon == nullptr)
+        return FTransform();
+
+    FTransform LhikTransform = CurrentWeapon->GetSocketTransform(UWeaponMaster::LhikSocketName);
+    FVector OutVector;
+    FRotator OutRotation;
+    GetMesh()->TransformToBoneSpace(TEXT("hand_r"), LhikTransform.GetLocation(), LhikTransform.Rotator(), OutVector, OutRotation);
+    return FTransform(OutRotation, OutVector, FVector::One());
+}
+
 UWeaponMaster* AMainPlayerCharacter::GetCurrentWeapon()
 {
     UWeaponMaster** WeaponMaster = CurrentWeapons.Find(CurrentWeaponClass);

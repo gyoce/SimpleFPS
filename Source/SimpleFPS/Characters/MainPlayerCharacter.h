@@ -98,6 +98,9 @@ private:
 	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
 	void SetCurrentWeapon(EWeaponClass WeaponClass);
 
+	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
+	FTransform GetLhikTransform();
+
 	bool bIsFirstPersonCamera = true;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
