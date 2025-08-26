@@ -3,6 +3,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "../Characters/MainPlayerCharacter.h"
+#include "../Actors/Weapon.h"
 
 AWeaponPickup::AWeaponPickup()
 {

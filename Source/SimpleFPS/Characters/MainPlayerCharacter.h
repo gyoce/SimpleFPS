@@ -9,6 +9,7 @@
 class USkeletalMeshComponent;
 class UCameraComponent;
 class USpringArmComponent;
+class AWeapon;
 
 UCLASS()
 class SIMPLEFPS_API AMainPlayerCharacter : public ACharacter
@@ -22,9 +23,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION()
-	void SpawnWeapon(TSubclassOf<class UWeaponMaster> WeaponToSpawn, FVector PickupLocation);
-
-	void SpawnPickupWeapon(FVector& PickupLocation, UWeaponMaster* WeaponMaster);
+	void SpawnWeapon(TSubclassOf<AWeapon> WeaponToSpawn, FVector PickupLocation);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnSwitchingWeapon(EWeaponClass WeaponClass);
@@ -70,7 +69,7 @@ private:
 	UInputAction* EquipUnarmedWeaponAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TMap<EWeaponClass, UWeaponMaster*> CurrentWeapons;
+	TMap<EWeaponClass, AWeapon*> CurrentWeapons;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EWeaponClass CurrentWeaponClass;
@@ -89,11 +88,11 @@ private:
 	void EquipSecondaryWeapon(const FInputActionValue& Value);
 	void EquipUnarmedWeapon(const FInputActionValue& Value);
 
-	UWeaponMaster* GetWeaponOfClass(EWeaponClass WeaponClass);
+	void SpawnPickupWeapon(FVector& PickupLocation, AWeapon* Weapon);
 	void HideAllWeaponsExceptCurrent();
 
 	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
-	UWeaponMaster* GetCurrentWeapon();
+	AWeapon* GetCurrentWeapon();
 
 	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
 	void SetCurrentWeapon(EWeaponClass WeaponClass);

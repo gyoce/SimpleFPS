@@ -6,10 +6,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "EnhancedInputSubsystems.h"
-#include "DrawDebugHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Actors/WeaponPickup.h"
-#include "../Components/WeaponMaster.h"
+#include "../Actors/Weapon.h"
 
 AMainPlayerCharacter::AMainPlayerCharacter()
 {
@@ -92,22 +91,23 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
     }
 }
 
-void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<UWeaponMaster> WeaponToSpawn, FVector PickupLocation)
+void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<AWeapon> WeaponToSpawn, FVector PickupLocation)
 {
-    CurrentWeaponClass = WeaponToSpawn->GetDefaultObject<UWeaponMaster>()->GetWeaponClass();
-    UWeaponMaster* WeaponMaster = GetWeaponOfClass(CurrentWeaponClass);
+    CurrentWeaponClass = WeaponToSpawn->GetDefaultObject<AWeapon>()->GetWeaponClass();
+    AWeapon* CurrentWeapon = GetCurrentWeapon();
 
-    if (WeaponMaster != nullptr)
-        SpawnPickupWeapon(PickupLocation, WeaponMaster);
+    if (CurrentWeapon != nullptr)
+        SpawnPickupWeapon(PickupLocation, CurrentWeapon);
  
-    UWeaponMaster* NewWeaponMaster = Cast<UWeaponMaster>(AddComponentByClass(WeaponToSpawn, false, FTransform::Identity, false));
-    CurrentWeapons.Add({ CurrentWeaponClass, NewWeaponMaster });
-    NewWeaponMaster->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, NewWeaponMaster->GetSocketName());
+    AWeapon* NewWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToSpawn);
+    NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, NewWeapon->GetSocketName());
+    NewWeapon->SetOwner(this);
+    CurrentWeapons.Add({ CurrentWeaponClass, NewWeapon });
 
     HideAllWeaponsExceptCurrent();
 }
 
-void AMainPlayerCharacter::SpawnPickupWeapon(FVector& PickupLocation, UWeaponMaster* WeaponMaster)
+void AMainPlayerCharacter::SpawnPickupWeapon(FVector& PickupLocation, AWeapon* Weapon)
 {
     PickupLocation.Z += 10.f;
     FVector SpawnLocation = GetActorLocation() + GetActorTransform().GetRotation().GetForwardVector() * 50.f;
@@ -115,8 +115,8 @@ void AMainPlayerCharacter::SpawnPickupWeapon(FVector& PickupLocation, UWeaponMas
     FActorSpawnParameters SpawnParameters;
     SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-    GetWorld()->SpawnActor<AWeaponPickup>(WeaponMaster->GetPickupClass(), SpawnTransform, SpawnParameters);
-    WeaponMaster->DestroyComponent();
+    GetWorld()->SpawnActor<AWeaponPickup>(Weapon->GetPickupClass(), SpawnTransform, SpawnParameters);
+    Weapon->Destroy();
 }
 
 void AMainPlayerCharacter::Move(const FInputActionValue& Value)
@@ -148,24 +148,12 @@ void AMainPlayerCharacter::Look(const FInputActionValue& Value)
 
 void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
 {
-    UWeaponMaster* CurrentWeapon = GetCurrentWeapon();
+    AWeapon* CurrentWeapon = GetCurrentWeapon();
 
     if (CurrentWeapon == nullptr || !bCanFire)
         return;
 
-    CurrentWeapon->PlayAnimation(CurrentWeapon->GetFiringAnimation(), false);
-
-    FTransform SocketTransform = CurrentWeapon->GetSocketTransform(UWeaponMaster::BarrelSocketName);
-    FVector Start = SocketTransform.GetLocation();
-    FVector End = Start + SocketTransform.GetRotation().GetForwardVector() * CurrentWeapon->GetRange();
-    FHitResult HitResult;
-    FCollisionQueryParams CollisionQueryParams;
-    CollisionQueryParams.bTraceComplex = true;
-    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionQueryParams);
-    DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.0f);
-
-    if (bHit)
-        DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(5.f), FColor::Red, false, 2.0f);
+    CurrentWeapon->Shoot();
 }
 
 void AMainPlayerCharacter::SwitchCamera(const FInputActionValue&)
@@ -203,16 +191,10 @@ void AMainPlayerCharacter::EquipUnarmedWeapon(const FInputActionValue&)
     OnSwitchingWeapon(EWeaponClass::Unarmed);
 }
 
-UWeaponMaster* AMainPlayerCharacter::GetWeaponOfClass(EWeaponClass WeaponClass)
-{
-    UWeaponMaster** WeaponMaster = CurrentWeapons.Find(WeaponClass);
-    return WeaponMaster == nullptr ? nullptr : *WeaponMaster;
-}
-
 void AMainPlayerCharacter::HideAllWeaponsExceptCurrent()
 {
     for (const auto& [_, Weapon] : CurrentWeapons)
-        Weapon->SetVisibility(Weapon->GetWeaponClass() == CurrentWeaponClass);
+        Weapon->SetHidden(Weapon->GetWeaponClass() != CurrentWeaponClass);
 }
 
 void AMainPlayerCharacter::SetCurrentWeapon(EWeaponClass WeaponClass)
@@ -223,19 +205,19 @@ void AMainPlayerCharacter::SetCurrentWeapon(EWeaponClass WeaponClass)
 
 FTransform AMainPlayerCharacter::GetLhikTransform()
 {
-    UWeaponMaster* CurrentWeapon = GetCurrentWeapon();
+    AWeapon* CurrentWeapon = GetCurrentWeapon();
     if (CurrentWeapon == nullptr)
         return FTransform();
 
-    FTransform LhikTransform = CurrentWeapon->GetSocketTransform(UWeaponMaster::LhikSocketName);
+    FTransform LhikTransform = CurrentWeapon->GetLhikTransform();
     FVector OutVector;
     FRotator OutRotation;
     GetMesh()->TransformToBoneSpace(TEXT("hand_r"), LhikTransform.GetLocation(), LhikTransform.Rotator(), OutVector, OutRotation);
     return FTransform(OutRotation, OutVector, FVector::One());
 }
 
-UWeaponMaster* AMainPlayerCharacter::GetCurrentWeapon()
+AWeapon* AMainPlayerCharacter::GetCurrentWeapon()
 {
-    UWeaponMaster** WeaponMaster = CurrentWeapons.Find(CurrentWeaponClass);
-    return WeaponMaster == nullptr ? nullptr : *WeaponMaster;
+    AWeapon** Weapon = CurrentWeapons.Find(CurrentWeaponClass);
+    return Weapon == nullptr ? nullptr : *Weapon;
 }

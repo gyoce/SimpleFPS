@@ -1,21 +1,26 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/Actor.h"
 #include "../Enums/WeaponName.h"
 #include "../Enums/WeaponType.h"
 #include "../Enums/WeaponClass.h"
-#include "WeaponMaster.generated.h"
+#include "Weapon.generated.h"
 
+class USkeletalMeshComponent;
 class AWeaponPickup;
 
 UCLASS()
-class SIMPLEFPS_API UWeaponMaster : public USkeletalMeshComponent
+class SIMPLEFPS_API AWeapon : public AActor
 {
     GENERATED_BODY()
+    
+public:	
+    AWeapon();
 
-public:
-    UWeaponMaster();
+    virtual void Tick(float DeltaTime) override;
+
+    virtual void Shoot();
 
     TSubclassOf<AWeaponPickup> GetPickupClass() const { return PickupClass; }
     FName GetSocketName() const { return SocketName; }
@@ -24,10 +29,18 @@ public:
     float GetRange() const { return Range; }
     EWeaponClass GetWeaponClass() const { return WeaponClass; }
 
+    FTransform GetLhikTransform();
+
     static const FName BarrelSocketName;
     static const FName LhikSocketName;
 
 protected:
+    virtual void BeginPlay() override;
+
+private:
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+    USkeletalMeshComponent* Mesh;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
     float Damage;
 

@@ -7,6 +7,7 @@
 
 class UStaticMeshComponent;
 class USphereComponent;
+class AWeapon;
 
 UCLASS()
 class SIMPLEFPS_API AWeaponPickup : public AActor, public IInteractInterface
@@ -31,5 +32,5 @@ private:
     USphereComponent* PickupRadius;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
-    TSubclassOf<class UWeaponMaster> WeaponToSpawn;
+    TSubclassOf<AWeapon> WeaponToSpawn;
 };
