@@ -20,13 +20,12 @@ public:
 
     virtual void Tick(float DeltaTime) override;
 
-    virtual void Shoot();
+    virtual void Shoot(FVector StartLocation, FVector Direction);
 
     TSubclassOf<AWeaponPickup> GetPickupClass() const { return PickupClass; }
     FName GetSocketName() const { return SocketName; }
     EWeaponName GetWeaponName() const { return WeaponName; }
     UAnimSequence* GetFiringAnimation() const { return FiringAnimation; }
-    float GetRange() const { return Range; }
     EWeaponClass GetWeaponClass() const { return WeaponClass; }
 
     FTransform GetLhikTransform();

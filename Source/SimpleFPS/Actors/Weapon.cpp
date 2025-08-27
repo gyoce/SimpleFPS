@@ -23,18 +23,16 @@ void AWeapon::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 }
 
-void AWeapon::Shoot()
+void AWeapon::Shoot(FVector StartLocation, FVector Direction)
 {
     Mesh->PlayAnimation(GetFiringAnimation(), false);
 
-    FTransform SocketTransform = Mesh->GetSocketTransform(AWeapon::BarrelSocketName);
-    FVector Start = SocketTransform.GetLocation();
-    FVector End = Start + SocketTransform.GetRotation().GetForwardVector() * GetRange();
+    FVector End = StartLocation + Direction * Range;
     FHitResult HitResult;
     FCollisionQueryParams CollisionQueryParams;
     CollisionQueryParams.bTraceComplex = true;
-    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility, CollisionQueryParams);
-    DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.0f);
+    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, End, ECollisionChannel::ECC_Visibility, CollisionQueryParams);
+    DrawDebugLine(GetWorld(), StartLocation, End, FColor::Red, false, 2.0f);
 
     if (bHit)
         DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(5.f), FColor::Red, false, 2.0f);

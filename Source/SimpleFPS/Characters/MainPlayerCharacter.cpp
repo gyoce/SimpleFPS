@@ -153,7 +153,7 @@ void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
     if (CurrentWeapon == nullptr || !bCanFire)
         return;
 
-    CurrentWeapon->Shoot();
+    CurrentWeapon->Shoot(FirstPersonCameraComponent->GetComponentLocation(), FirstPersonCameraComponent->GetForwardVector());
 }
 
 void AMainPlayerCharacter::SwitchCamera(const FInputActionValue&)
