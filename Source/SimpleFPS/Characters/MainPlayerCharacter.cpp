@@ -4,6 +4,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "UObject/ConstructorHelpers.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -53,6 +54,11 @@ void AMainPlayerCharacter::ConfigFirstPerson()
 void AMainPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+    PlayerController = Cast<APlayerController>(GetController());
+    check(PlayerController);
+    PlayerController->PlayerCameraManager->ViewPitchMax = +60.f;
+    PlayerController->PlayerCameraManager->ViewPitchMin = -60.f;
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -68,19 +74,16 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
     {
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Move);
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Canceled, this, &AMainPlayerCharacter::StopMove);
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopMove);
-
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Look);
-
         EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Shoot);
-
+        EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::StartAim);
+        EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopAim);
+        EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Canceled, this, &AMainPlayerCharacter::StopAim);
         EnhancedInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::SwitchCamera);
-
         EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Interact);
-
         EnhancedInputComponent->BindAction(EquipPrimaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipPrimaryWeapon);
         EnhancedInputComponent->BindAction(EquipSecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipSecondaryWeapon);
         EnhancedInputComponent->BindAction(EquipUnarmedWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipUnarmedWeapon);
@@ -154,6 +157,18 @@ void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
         return;
 
     CurrentWeapon->Shoot(FirstPersonCameraComponent->GetComponentLocation(), FirstPersonCameraComponent->GetForwardVector());
+}
+
+void AMainPlayerCharacter::StartAim(const FInputActionValue& Value)
+{
+    bIsAiming = true;
+    GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeedWhileAiming;
+}
+
+void AMainPlayerCharacter::StopAim(const FInputActionValue& Value)
+{
+    bIsAiming = false;
+    GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
 }
 
 void AMainPlayerCharacter::SwitchCamera(const FInputActionValue&)

@@ -60,6 +60,9 @@ private:
 	UInputAction* ShootAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UInputAction* AimAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* EquipPrimaryWeaponAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
@@ -82,6 +85,8 @@ private:
 	void StopMove(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Shoot(const FInputActionValue& Value);
+	void StartAim(const FInputActionValue& Value);
+	void StopAim(const FInputActionValue& Value);
 	void SwitchCamera(const FInputActionValue& Value);
 	void Interact(const FInputActionValue& Value);
 	void EquipPrimaryWeapon(const FInputActionValue& Value);
@@ -100,8 +105,21 @@ private:
 	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
 	FTransform GetLhikTransform();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bIsFirstPersonCamera = true;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bCanFire = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	bool bIsAiming = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customizable", meta = (AllowPrivateAccess = "true"))
+	float MaxWalkSpeed = 600.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customizable", meta = (AllowPrivateAccess = "true"))
+	float MaxWalkSpeedWhileAiming = 300.f;
+
+	// Cache variables
+	APlayerController* PlayerController = nullptr;
 };
