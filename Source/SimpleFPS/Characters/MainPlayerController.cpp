@@ -6,8 +6,7 @@ void AMainPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-    {
-        Subsystem->AddMappingContext(InputMappingContext, 0);
-    }
+    LocalPlayerSubsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+    check(LocalPlayerSubsystem);
+    LocalPlayerSubsystem->AddMappingContext(InputMappingContext, 0);
 }

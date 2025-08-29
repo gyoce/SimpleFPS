@@ -10,6 +10,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Actors/WeaponPickup.h"
 #include "../Actors/Weapon.h"
+#include "../Characters/MainPlayerController.h"
+#include "../Settings/MainEnhancedInputUserSettings.h"
 
 AMainPlayerCharacter::AMainPlayerCharacter()
 {
@@ -55,10 +57,11 @@ void AMainPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-    PlayerController = Cast<APlayerController>(GetController());
+    PlayerController = Cast<AMainPlayerController>(GetController());
     check(PlayerController);
     PlayerController->PlayerCameraManager->ViewPitchMax = +60.f;
     PlayerController->PlayerCameraManager->ViewPitchMin = -60.f;
+    UserSettings = PlayerController->LocalPlayerSubsystem->GetUserSettings<UMainEnhancedInputUserSettings>();
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -163,12 +166,16 @@ void AMainPlayerCharacter::StartAim(const FInputActionValue& Value)
 {
     bIsAiming = true;
     GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeedWhileAiming;
+    UserSettings->SetAimSensitivity(0.5f, 0.5f);
+    OnAiming(bIsAiming);
 }
 
 void AMainPlayerCharacter::StopAim(const FInputActionValue& Value)
 {
     bIsAiming = false;
     GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+    UserSettings->SetAimSensitivity(1.f, 1.f);
+    OnAiming(bIsAiming);
 }
 
 void AMainPlayerCharacter::SwitchCamera(const FInputActionValue&)

@@ -10,6 +10,8 @@ class USkeletalMeshComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class AWeapon;
+class AMainPlayerController;
+class UMainEnhancedInputUserSettings;
 
 UCLASS()
 class SIMPLEFPS_API AMainPlayerCharacter : public ACharacter
@@ -27,6 +29,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnSwitchingWeapon(EWeaponClass WeaponClass);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAiming(bool bAiming);
 
 protected:
 	virtual void BeginPlay() override;
@@ -121,5 +126,6 @@ private:
 	float MaxWalkSpeedWhileAiming = 300.f;
 
 	// Cache variables
-	APlayerController* PlayerController = nullptr;
+	AMainPlayerController* PlayerController = nullptr;
+	UMainEnhancedInputUserSettings* UserSettings = nullptr;
 };
