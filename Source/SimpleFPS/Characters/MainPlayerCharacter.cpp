@@ -82,6 +82,9 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopMove);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Look);
         EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Shoot);
+        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::StartSprint);
+        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Canceled, this, &AMainPlayerCharacter::StartSprint);
+        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopSprint);
         EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::StartAim);
         EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopAim);
         EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Canceled, this, &AMainPlayerCharacter::StopAim);
@@ -152,7 +155,23 @@ void AMainPlayerCharacter::Look(const FInputActionValue& Value)
     }
 }
 
-void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
+void AMainPlayerCharacter::StartSprint(const FInputActionValue&)
+{
+    if (bIsAiming)
+        return;
+
+    GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeedWhileSprinting;
+}
+
+void AMainPlayerCharacter::StopSprint(const FInputActionValue&)
+{
+    if (bIsAiming)
+        return;
+
+    GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+}
+
+void AMainPlayerCharacter::Shoot(const FInputActionValue&)
 {
     AWeapon* CurrentWeapon = GetCurrentWeapon();
 
@@ -162,7 +181,7 @@ void AMainPlayerCharacter::Shoot(const FInputActionValue& Value)
     CurrentWeapon->Shoot(FirstPersonCameraComponent->GetComponentLocation(), FirstPersonCameraComponent->GetForwardVector());
 }
 
-void AMainPlayerCharacter::StartAim(const FInputActionValue& Value)
+void AMainPlayerCharacter::StartAim(const FInputActionValue&)
 {
     bIsAiming = true;
     GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeedWhileAiming;
@@ -170,7 +189,7 @@ void AMainPlayerCharacter::StartAim(const FInputActionValue& Value)
     OnAiming(bIsAiming);
 }
 
-void AMainPlayerCharacter::StopAim(const FInputActionValue& Value)
+void AMainPlayerCharacter::StopAim(const FInputActionValue&)
 {
     bIsAiming = false;
     GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
