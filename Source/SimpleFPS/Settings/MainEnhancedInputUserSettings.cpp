@@ -12,3 +12,8 @@ FVector UMainEnhancedInputUserSettings::GetSensitivity()
 {
     return FVector(AimSensitivityX, AimSensitivityY, 1.f);
 }
+
+void UMainEnhancedInputUserSettings::SetUseAimingDownSightScale(bool bAiming)
+{
+    bUseAimingDownSightScale = bAiming;
+}

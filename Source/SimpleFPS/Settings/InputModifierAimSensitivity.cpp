@@ -8,6 +8,8 @@ FInputActionValue UInputModifierAimSensitivity::ModifyRaw_Implementation(const U
 {
     EnsureSettingsIsSet(PlayerInput);
 
+    if (Settings->UseAimingDownSightScale())
+        return (CurrentValue.Get<FVector>() * Settings->GetSensitivity()) * FVector(0.3f, 0.3f, 1.f);
     return CurrentValue.Get<FVector>() * Settings->GetSensitivity();
 }
 

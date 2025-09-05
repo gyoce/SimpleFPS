@@ -89,7 +89,12 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
         EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopAim);
         EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Canceled, this, &AMainPlayerCharacter::StopAim);
         EnhancedInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::SwitchCamera);
+
         EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Interact);
+        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::StartInteract);
+        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopInteract);
+        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Canceled, this, &AMainPlayerCharacter::StopInteract);
+
         EnhancedInputComponent->BindAction(EquipPrimaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipPrimaryWeapon);
         EnhancedInputComponent->BindAction(EquipSecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipSecondaryWeapon);
         EnhancedInputComponent->BindAction(EquipUnarmedWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipUnarmedWeapon);
@@ -185,7 +190,7 @@ void AMainPlayerCharacter::StartAim(const FInputActionValue&)
 {
     bIsAiming = true;
     GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeedWhileAiming;
-    UserSettings->SetAimSensitivity(0.5f, 0.5f);
+    UserSettings->SetUseAimingDownSightScale(bIsAiming);
     OnAiming(bIsAiming);
 }
 
@@ -193,7 +198,7 @@ void AMainPlayerCharacter::StopAim(const FInputActionValue&)
 {
     bIsAiming = false;
     GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
-    UserSettings->SetAimSensitivity(1.f, 1.f);
+    UserSettings->SetUseAimingDownSightScale(bIsAiming);
     OnAiming(bIsAiming);
 }
 
@@ -215,6 +220,16 @@ void AMainPlayerCharacter::Interact(const FInputActionValue&)
 
     AWeaponPickup* FirstResult = Cast<AWeaponPickup>(Result[0]);
     FirstResult->Interact(this);
+}
+
+void AMainPlayerCharacter::StartInteract(const FInputActionValue&)
+{
+    OnStartInteract();
+}
+
+void AMainPlayerCharacter::StopInteract(const FInputActionValue&)
+{
+    OnStopInteract();
 }
 
 void AMainPlayerCharacter::EquipPrimaryWeapon(const FInputActionValue&)
