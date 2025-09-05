@@ -55,3 +55,4 @@ Session.vim
 !/img/**
 !.editorconfig
 !shadertoolsconfig.json
+!/Imgs/**
