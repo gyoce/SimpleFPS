@@ -17,7 +17,7 @@ AWeaponPickup::AWeaponPickup()
     SetRootComponent(PickupObjectMesh);
 
     PickupRadius = CreateDefaultSubobject<USphereComponent>(TEXT("Pickup Radius"));
-    PickupRadius->SetSphereRadius(100.f);
+    PickupRadius->SetSphereRadius(50.0f);
     PickupRadius->SetupAttachment(PickupObjectMesh);
 }
 

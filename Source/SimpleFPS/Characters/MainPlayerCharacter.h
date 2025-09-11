@@ -98,17 +98,15 @@ private:
 	void StartAim(const FInputActionValue& Value);
 	void StopAim(const FInputActionValue& Value);
 	void SwitchCamera(const FInputActionValue& Value);
-
 	void Interact(const FInputActionValue& Value);
-	void StartInteract(const FInputActionValue& Value);
-	void StopInteract(const FInputActionValue& Value);
-	
+		
 	void EquipPrimaryWeapon(const FInputActionValue& Value);
 	void EquipSecondaryWeapon(const FInputActionValue& Value);
 	void EquipUnarmedWeapon(const FInputActionValue& Value);
 
 	void SpawnPickupWeapon(FVector& PickupLocation, AWeapon* Weapon);
 	void HideAllWeaponsExceptCurrent();
+	void SearchForItemToPickup();
 
 	UFUNCTION(BlueprintCallable, meta = (AllowPrivateAccess = "true"))
 	AWeapon* GetCurrentWeapon();

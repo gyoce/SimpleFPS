@@ -21,6 +21,9 @@ public:
 
     virtual void Interact(class AMainPlayerCharacter* CharacterPickingUp) override;
 
+    UFUNCTION(BlueprintImplementableEvent)
+    void SetInteractable(bool bInteractable);
+
 protected:
     virtual void BeginPlay() override;
 

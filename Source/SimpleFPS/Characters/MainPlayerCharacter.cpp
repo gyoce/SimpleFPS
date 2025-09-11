@@ -67,6 +67,40 @@ void AMainPlayerCharacter::BeginPlay()
 void AMainPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+    SearchForItemToPickup();
+}
+
+void AMainPlayerCharacter::SearchForItemToPickup()
+{
+    constexpr int HowFar = 300;
+    FVector CameraLocation;
+    FRotator CameraRotation;
+    Controller->GetPlayerViewPoint(CameraLocation, CameraRotation);
+    const FVector StartTrace = CameraLocation;
+    const FVector Direction = CameraRotation.Vector();
+    const FVector EndTrace = StartTrace + Direction * HowFar;
+    FCollisionQueryParams CollisionQueryParams;
+    FHitResult HitResult;
+    bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility, CollisionQueryParams);
+
+    static AWeaponPickup* OldWeaponPickup = nullptr;
+
+    if (bHit)
+    {
+        AActor* ActorResult = HitResult.GetActor();
+        AWeaponPickup* WeaponPickup = Cast<AWeaponPickup>(ActorResult);
+        if (ActorResult != nullptr && WeaponPickup != nullptr)
+        {
+            //DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(5.f), FColor::Green, true, -1.0f);
+            WeaponPickup->SetInteractable(true);
+            OldWeaponPickup = WeaponPickup;
+        }
+        else if(OldWeaponPickup != nullptr)
+            OldWeaponPickup->SetInteractable(false);
+    }
+    else if (OldWeaponPickup != nullptr)
+        OldWeaponPickup->SetInteractable(false);
 }
 
 void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -91,9 +125,6 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
         EnhancedInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::SwitchCamera);
 
         EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Interact);
-        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::StartInteract);
-        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopInteract);
-        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Canceled, this, &AMainPlayerCharacter::StopInteract);
 
         EnhancedInputComponent->BindAction(EquipPrimaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipPrimaryWeapon);
         EnhancedInputComponent->BindAction(EquipSecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipSecondaryWeapon);
@@ -220,16 +251,6 @@ void AMainPlayerCharacter::Interact(const FInputActionValue&)
 
     AWeaponPickup* FirstResult = Cast<AWeaponPickup>(Result[0]);
     FirstResult->Interact(this);
-}
-
-void AMainPlayerCharacter::StartInteract(const FInputActionValue&)
-{
-    OnStartInteract();
-}
-
-void AMainPlayerCharacter::StopInteract(const FInputActionValue&)
-{
-    OnStopInteract();
 }
 
 void AMainPlayerCharacter::EquipPrimaryWeapon(const FInputActionValue&)

@@ -7,5 +7,6 @@ What I explored so far:
 - Events linked between blueprints & C++
 - Aim offset
 - Line tracing
+- Enhanced Input Settings & Custom Input Modifier
 
 ![SimpleFPS](/Imgs/SimpleFPS.png)
