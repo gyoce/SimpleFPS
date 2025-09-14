@@ -10,8 +10,11 @@ class USkeletalMeshComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class AWeapon;
+class AWeaponPickup;
 class AMainPlayerController;
 class UMainEnhancedInputUserSettings;
+class UUserWidget;
+class UInteractWidget;
 
 UCLASS()
 class SIMPLEFPS_API AMainPlayerCharacter : public ACharacter
@@ -85,6 +88,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	EWeaponClass CurrentWeaponClass;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class UUserWidget> InteractWidgetClass;
+
 	void ConfigMesh();
 	void ConfigThirdPerson();
 	void ConfigFirstPerson();
@@ -98,7 +104,10 @@ private:
 	void StartAim(const FInputActionValue& Value);
 	void StopAim(const FInputActionValue& Value);
 	void SwitchCamera(const FInputActionValue& Value);
+
 	void Interact(const FInputActionValue& Value);
+	void StartInteract(const FInputActionValue& Value);
+	void StopInteract(const FInputActionValue& Value);
 		
 	void EquipPrimaryWeapon(const FInputActionValue& Value);
 	void EquipSecondaryWeapon(const FInputActionValue& Value);
@@ -135,7 +144,13 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customizable", meta = (AllowPrivateAccess = "true"))
 	float MaxWalkSpeedWhileAiming = 300.f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	UUserWidget* UserWidgetInteract = nullptr;
+
 	// Cache variables
 	AMainPlayerController* PlayerController = nullptr;
 	UMainEnhancedInputUserSettings* UserSettings = nullptr;
+	AWeaponPickup* OldWeaponPickup = nullptr;
+	AWeaponPickup* WeaponToPickup = nullptr;
+	UInteractWidget* InteractWidget = nullptr;
 };

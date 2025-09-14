@@ -12,6 +12,7 @@
 #include "../Actors/Weapon.h"
 #include "../Characters/MainPlayerController.h"
 #include "../Settings/MainEnhancedInputUserSettings.h"
+#include "../UI/InteractWidget.h"
 
 AMainPlayerCharacter::AMainPlayerCharacter()
 {
@@ -62,6 +63,12 @@ void AMainPlayerCharacter::BeginPlay()
     PlayerController->PlayerCameraManager->ViewPitchMax = +60.f;
     PlayerController->PlayerCameraManager->ViewPitchMin = -60.f;
     UserSettings = PlayerController->LocalPlayerSubsystem->GetUserSettings<UMainEnhancedInputUserSettings>();
+
+    UserWidgetInteract = CreateWidget(PlayerController, InteractWidgetClass);
+    check(UserWidgetInteract);
+    UserWidgetInteract->AddToViewport();
+    InteractWidget = Cast<UInteractWidget>(UserWidgetInteract);
+    check(InteractWidget);
 }
 
 void AMainPlayerCharacter::Tick(float DeltaTime)
@@ -83,8 +90,7 @@ void AMainPlayerCharacter::SearchForItemToPickup()
     FCollisionQueryParams CollisionQueryParams;
     FHitResult HitResult;
     bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility, CollisionQueryParams);
-
-    static AWeaponPickup* OldWeaponPickup = nullptr;
+    bool bHitWeaponPickable = false;
 
     if (bHit)
     {
@@ -92,15 +98,26 @@ void AMainPlayerCharacter::SearchForItemToPickup()
         AWeaponPickup* WeaponPickup = Cast<AWeaponPickup>(ActorResult);
         if (ActorResult != nullptr && WeaponPickup != nullptr)
         {
-            //DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(5.f), FColor::Green, true, -1.0f);
+            WeaponToPickup = WeaponPickup;
             WeaponPickup->SetInteractable(true);
+            InteractWidget->SetInteract(true);
             OldWeaponPickup = WeaponPickup;
         }
-        else if(OldWeaponPickup != nullptr)
+        else
+        {
+            WeaponToPickup = nullptr;
+            InteractWidget->SetInteract(false);
+            if (OldWeaponPickup != nullptr && IsValid(OldWeaponPickup))
+                OldWeaponPickup->SetInteractable(false);
+        }
+    }
+    else
+    {
+        WeaponToPickup = nullptr;
+        InteractWidget->SetInteract(false);
+        if (OldWeaponPickup != nullptr && IsValid(OldWeaponPickup))
             OldWeaponPickup->SetInteractable(false);
     }
-    else if (OldWeaponPickup != nullptr)
-        OldWeaponPickup->SetInteractable(false);
 }
 
 void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -125,6 +142,9 @@ void AMainPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
         EnhancedInputComponent->BindAction(SwitchCameraAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::SwitchCamera);
 
         EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::Interact);
+        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AMainPlayerCharacter::StartInteract);
+        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Canceled, this, &AMainPlayerCharacter::StopInteract);
+        EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AMainPlayerCharacter::StopInteract);
 
         EnhancedInputComponent->BindAction(EquipPrimaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipPrimaryWeapon);
         EnhancedInputComponent->BindAction(EquipSecondaryWeaponAction, ETriggerEvent::Triggered, this, &AMainPlayerCharacter::EquipSecondaryWeapon);
@@ -154,7 +174,7 @@ void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<AWeapon> WeaponToSpawn, FVect
 
 void AMainPlayerCharacter::SpawnPickupWeapon(FVector& PickupLocation, AWeapon* Weapon)
 {
-    PickupLocation.Z += 10.f;
+    PickupLocation.Z += 50.f;
     FVector SpawnLocation = GetActorLocation() + GetActorTransform().GetRotation().GetForwardVector() * 50.f;
     FTransform SpawnTransform(SpawnLocation);
     FActorSpawnParameters SpawnParameters;
@@ -243,14 +263,23 @@ void AMainPlayerCharacter::SwitchCamera(const FInputActionValue&)
 
 void AMainPlayerCharacter::Interact(const FInputActionValue&)
 {
-    TArray<AActor*> Result;
-    GetOverlappingActors(Result, AWeaponPickup::StaticClass());
+    if (WeaponToPickup)
+    {
+        WeaponToPickup->Interact(this);
+        InteractWidget->StopInteract();
+    }
+}
 
-    if (Result.IsEmpty())
-        return;
+void AMainPlayerCharacter::StartInteract(const FInputActionValue& Value)
+{
+    if (WeaponToPickup)
+        InteractWidget->StartInteract();
+}
 
-    AWeaponPickup* FirstResult = Cast<AWeaponPickup>(Result[0]);
-    FirstResult->Interact(this);
+void AMainPlayerCharacter::StopInteract(const FInputActionValue& Value)
+{
+    if (WeaponToPickup)
+        InteractWidget->StopInteract();
 }
 
 void AMainPlayerCharacter::EquipPrimaryWeapon(const FInputActionValue&)
