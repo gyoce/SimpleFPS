@@ -9,6 +9,7 @@
 
 class USkeletalMeshComponent;
 class AWeaponPickup;
+class AController;
 
 UCLASS()
 class SIMPLEFPS_API AWeapon : public AActor
@@ -63,4 +64,9 @@ private:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
     UAnimSequence* FiringAnimation;
+
+    AController* GetOwnerController();
+
+    // Cache variables
+    AController* OwnerController = nullptr;
 };
