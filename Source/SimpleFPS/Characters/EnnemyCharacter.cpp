@@ -27,7 +27,6 @@ float AEnnemyCharacter::TakeDamage(float Damage, struct FDamageEvent const& Dama
 	float DamageToApply = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	DamageToApply = FMath::Min(Health, DamageToApply);
 	Health -= DamageToApply;
-	UE_LOG(LogTemp, Warning, TEXT("TAKE DAMAGE"));
 
 	if (Health <= 0.0f)
 	{

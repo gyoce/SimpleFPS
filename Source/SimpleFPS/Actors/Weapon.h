@@ -11,6 +11,8 @@ class USkeletalMeshComponent;
 class AWeaponPickup;
 class AController;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHit);
+
 UCLASS()
 class SIMPLEFPS_API AWeapon : public AActor
 {
@@ -30,6 +32,8 @@ public:
     EWeaponClass GetWeaponClass() const { return WeaponClass; }
 
     FTransform GetLhikTransform();
+
+    FOnHit OnHit;
 
     static const FName BarrelSocketName;
     static const FName LhikSocketName;

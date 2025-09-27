@@ -2,6 +2,7 @@
 
 #include "DrawDebugHelpers.h"
 #include "Engine/DamageEvents.h"
+#include "../Characters/EnnemyCharacter.h"
 
 const FName AWeapon::BarrelSocketName = TEXT("barrel");
 const FName AWeapon::LhikSocketName = TEXT("LHIK");
@@ -45,16 +46,18 @@ void AWeapon::Shoot(FVector StartLocation, FVector Direction)
     FCollisionQueryParams CollisionQueryParams;
     CollisionQueryParams.bTraceComplex = true;
     bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, End, ECollisionChannel::ECC_Visibility, CollisionQueryParams);
-    DrawDebugLine(GetWorld(), StartLocation, End, FColor::Red, false, 2.0f);
+    //DrawDebugLine(GetWorld(), StartLocation, End, FColor::Red, false, 2.0f);
 
     if (bHit)
     {
-        DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(5.f), FColor::Red, false, 2.0f);
+        //DrawDebugBox(GetWorld(), HitResult.ImpactPoint, FVector(5.f), FColor::Red, false, 2.0f);
         AActor* HitActor = HitResult.GetActor();
-        if (HitActor != nullptr)
+        if (HitActor != nullptr && HitActor->IsA<AEnnemyCharacter>())
         {
             FPointDamageEvent DamageEvent(Damage, HitResult, End, nullptr);
             HitActor->TakeDamage(Damage, DamageEvent, GetOwnerController(), this);
+            UE_LOG(LogTemp, Warning, TEXT("ACTOR TAKE DAMAGE"));
+            OnHit.Broadcast();
         }
     }
 }

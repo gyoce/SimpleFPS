@@ -167,6 +167,7 @@ void AMainPlayerCharacter::SpawnWeapon(TSubclassOf<AWeapon> WeaponToSpawn, FVect
     AWeapon* NewWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponToSpawn);
     NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, NewWeapon->GetSocketName());
     NewWeapon->SetOwner(this);
+    NewWeapon->OnHit.AddDynamic(this, &AMainPlayerCharacter::OnWeaponHit);
     CurrentWeapons.Add({ CurrentWeaponClass, NewWeapon });
 
     HideAllWeaponsExceptCurrent();

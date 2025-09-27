@@ -36,6 +36,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnAiming(bool bAiming);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnWeaponHit();
+
 protected:
 	virtual void BeginPlay() override;
 
